@@ -1,0 +1,35 @@
+
+# Dependencies
+node_modules/
+vendor/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Build and coverage output
+dist/
+build/
+out/
+coverage/
+.cache/
+.next/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Temporary files
+*.tmp
+*.swp
