@@ -13,8 +13,22 @@ import {
 import { ASSETS } from '../lib/assets';
 import { renderDesignTexture } from '../lib/textureRenderer';
 import type { DesignConfig } from '../types/poc';
+import { DesignProofImage } from './DesignProofImage';
 
 const isMesh = (object: Object3D): object is Mesh => (object as Mesh).isMesh;
+
+const canCreateWebGLContext = () => {
+  if (typeof document === 'undefined') {
+    return false;
+  }
+
+  const canvas = document.createElement('canvas');
+  const context =
+    canvas.getContext('webgl2', { failIfMajorPerformanceCaveat: true }) ??
+    canvas.getContext('webgl', { failIfMajorPerformanceCaveat: true });
+
+  return Boolean(context);
+};
 
 const useDesignTexture = (design: DesignConfig) => {
   const [texture, setTexture] = useState<CanvasTexture | null>(null);
@@ -97,8 +111,39 @@ function SceneFallback() {
 }
 
 export function JerseyScene({ design }: { design: DesignConfig }) {
+  const [webglBlocked, setWebglBlocked] = useState(() => !canCreateWebGLContext());
+
+  if (webglBlocked) {
+    return (
+      <div className="webgl-fallback">
+        <DesignProofImage design={design} />
+        <div>
+          <strong>3D preview unavailable</strong>
+          <span>Your browser blocked WebGL. The generated design proof is still available.</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Canvas camera={{ position: [0, 0.14, 1.15], fov: 34 }} shadows dpr={[1, 2]}>
+    <Canvas
+      camera={{ position: [0, 0.14, 1.15], fov: 34 }}
+      gl={{
+        antialias: true,
+        powerPreference: 'default',
+      }}
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener('webglcontextlost', () => setWebglBlocked(true), {
+          once: true,
+        });
+      }}
+      onError={(error) => {
+        console.error(error);
+        setWebglBlocked(true);
+      }}
+      shadows
+      dpr={[1, 1.5]}
+    >
       <color attach="background" args={['#edf0f3']} />
       <ambientLight intensity={1.6} />
       <directionalLight position={[2, 2, 2]} intensity={2.2} castShadow />
@@ -117,5 +162,3 @@ export function JerseyScene({ design }: { design: DesignConfig }) {
     </Canvas>
   );
 }
-
-useGLTF.preload(ASSETS.model);

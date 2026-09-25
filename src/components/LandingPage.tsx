@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from 'react';
 import { usePocStore } from '../store/pocStore';
 import { CustomizerPage } from './CustomizerPage';
-import { JerseyScene } from './JerseyScene';
+import { DesignProofImage } from './DesignProofImage';
 
 const categories = ['Soccer Jersey', 'Training Kit', 'Shorts', 'Tracksuit'];
 
@@ -82,8 +82,10 @@ export function LandingPage() {
   return (
     <main className="landing-page">
       <section className={`landing-hero hero-theme-${slide.theme}`}>
-        <div className="hero-jersey-stage" aria-label="Live Noura jersey preview">
-          <JerseyScene design={design} />
+        <div className="hero-jersey-stage" aria-label="Noura jersey design preview">
+          <div className="hero-proof-frame">
+            <DesignProofImage design={design} />
+          </div>
         </div>
         <div className="hero-copy">
           <p className="hero-kicker">
